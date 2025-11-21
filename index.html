@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PinPulse - Platform Laporan Komunitas Cerdas</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@splidejs/splide@4.1.4/dist/js/splide.min.js"></script>
+    
+    <!-- Leaflet CSS untuk peta alternatif -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+     integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+     crossorigin=""/>
+    
+    <!-- Leaflet JS untuk peta alternatif -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+     integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+     crossorigin=""></script>
+    
+    <!-- Mapbox GL JS untuk gaya peta kustom -->
+    <script src='https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.js'></script>
+    <link href='https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.css' rel='stylesheet' />
+    
+    <!-- Configuration File -->
+    <script src="config.js"></script>
+</head>
+<body class="bg-gradient-to-br from-blue-50 to-purple-50 min-h-screen">
+    <!-- Header -->
+    <header class="bg-white/80 backdrop-blur-md shadow-sm border-b border-gray-200/50 sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-600 rounded-xl flex items-center justify-center shadow-lg transform hover:scale-110 transition-transform duration-200">
+                        <span class="text-white font-bold text-lg">📍</span>
+                    </div>
+                    <h1 class="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">PinPulse</h1>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <div class="flex items-center space-x-2 bg-white/60 px-4 py-2 rounded-full shadow-sm">
+                        <span class="text-sm font-medium text-gray-700">Skor Komunitas:</span>
+                        <span id="communityScore" class="text-lg font-bold text-purple-600">0</span>
+                    </div>
+                    <button id="surpriseBtn" class="surprise-btn bg-gradient-to-r from-pink-400 to-purple-500 text-white px-4 py-2 rounded-full font-medium shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200">
+                        🎉 Kejutan!
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <!-- Stats Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+            <div class="stat-card bg-white/70 backdrop-blur-sm rounded-2xl p-6 shadow-lg border border-white/50">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm font-medium text-gray-600">Total Laporan</p>
+                        <p id="totalReports" class="text-3xl font-bold text-blue-600">0</p>
+                    </div>
+                    <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
+                        <span class="text-2xl">📊</span>
+                    </div>
+                </div>
+            </div>
+            <div class="stat-card bg-white/70 backdrop-blur-sm rounded-2xl p-6 shadow-lg border border-white/50">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm font-medium text-gray-600">Darurat</p>
+                        <p id="emergencyCount" class="text-3xl font-bold text-red-600">0</p>
+                    </div>
+                    <div class="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center">
+                        <span class="text-2xl">🚨</span>
+                    </div>
+                </div>
+            </div>
+            <div class="stat-card bg-white/70 backdrop-blur-sm rounded-2xl p-6 shadow-lg border border-white/50">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm font-medium text-gray-600">Perlu Perhatian</p>
+                        <p id="attentionCount" class="text-3xl font-bold text-yellow-600">0</p>
+                    </div>
+                    <div class="w-12 h-12 bg-yellow-100 rounded-full flex items-center justify-center">
+                        <span class="text-2xl">⚠️</span>
+                    </div>
+                </div>
+            </div>
+            <div class="stat-card bg-white/70 backdrop-blur-sm rounded-2xl p-6 shadow-lg border border-white/50">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm font-medium text-gray-600">Ide Positif</p>
+                        <p id="positiveCount" class="text-3xl font-bold text-green-600">0</p>
+                    </div>
+                    <div class="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
+                        <span class="text-2xl">💡</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Map Section -->
+        <div class="bg-white/70 backdrop-blur-sm rounded-3xl p-6 shadow-xl border border-white/50 mb-8">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-2xl font-bold text-gray-800">
+                    🗺️ Peta Laporan Komunitas
+                </h2>
+                <div class="flex items-center space-x-3">
+                    <!-- Map Provider Toggle -->
+                    <div class="flex bg-gray-100 rounded-full p-1">
+                        <button id="leafletBtn" class="map-toggle-btn active px-4 py-2 rounded-full text-sm font-medium transition-all duration-200">
+                            🌿 Leaflet
+                        </button>
+                        <button id="mapboxBtn" class="map-toggle-btn px-4 py-2 rounded-full text-sm font-medium transition-all duration-200">
+                            🎨 Mapbox
+                        </button>
+                    </div>
+                    <!-- Map Style Toggle -->
+                    <select id="mapStyleSelect" class="bg-white border border-gray-300 rounded-lg px-3 py-2 text-sm">
+                        <option value="streets">Jalan</option>
+                        <option value="satellite">Satelit</option>
+                        <option value="dark">Gelap</option>
+                        <option value="light">Terang</option>
+                    </select>
+                </div>
+            </div>
+            
+            <!-- Map Container -->
+            <div id="map" class="w-full h-96 rounded-2xl shadow-lg border border-gray-200 relative overflow-hidden">
+                <!-- Loading State -->
+                <div id="mapLoading" class="absolute inset-0 bg-white/90 backdrop-blur-sm flex items-center justify-center z-50">
+                    <div class="text-center">
+                        <div class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mb-4"></div>
+                        <p class="text-gray-600 font-medium">Memuat peta komunitas...</p>
+                    </div>
+                </div>
+                
+                <!-- Map Error State -->
+                <div id="mapError" class="absolute inset-0 bg-red-50/95 backdrop-blur-sm flex items-center justify-center z-50 hidden">
+                    <div class="text-center">
+                        <div class="text-4xl mb-4">🗺️</div>
+                        <h3 class="text-lg font-semibold text-red-800 mb-2">Peta Tidak Tersedia</h3>
+                        <p class="text-red-600 text-sm mb-4">Google Maps mengalami masalah. Menggunakan alternatif peta...</p>
+                        <button id="retryMapBtn" class="bg-red-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-red-700 transition-colors">
+                            Coba Lagi
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Map Controls -->
+            <div class="flex justify-between items-center mt-4">
+                <div class="flex items-center space-x-4">
+                    <button id="locateBtn" class="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors">
+                        📍 Lokasi Saya
+                    </button>
+                    <button id="addReportBtn" class="bg-green-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-green-700 transition-colors">
+                        ➕ Tambah Laporan
+                    </button>
+                </div>
+                <div class="flex items-center space-x-2 text-sm text-gray-600">
+                    <span>🖱️ Klik pada peta untuk menambahkan laporan</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Reports -->
+        <div class="bg-white/70 backdrop-blur-sm rounded-3xl p-6 shadow-xl border border-white/50">
+            <h2 class="text-2xl font-bold text-gray-800 mb-6">
+                📋 Laporan Terbaru
+            </h2>
+            <div id="reportsList" class="space-y-4">
+                <!-- Reports will be loaded here -->
+            </div>
+        </div>
+    </main>
+
+    <!-- Report Modal -->
+    <div id="reportModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 hidden">
+        <div class="flex items-center justify-center min-h-screen p-4">
+            <div class="bg-white rounded-3xl p-6 w-full max-w-md shadow-2xl">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-xl font-bold text-gray-800">Tambah Laporan Baru</h3>
+                    <button id="closeModal" class="text-gray-500 hover:text-gray-700">
+                        <span class="text-2xl">×</span>
+                    </button>
+                </div>
+                
+                <form id="reportForm" class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Jenis Laporan</label>
+                        <select id="reportType" class="w-full border border-gray-300 rounded-lg px-3 py-2">
+                            <option value="emergency">🚨 Darurat</option>
+                            <option value="attention">⚠️ Perlu Perhatian</option>
+                            <option value="positive">💡 Ide Positif</option>
+                        </select>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Judul Laporan</label>
+                        <input type="text" id="reportTitle" class="w-full border border-gray-300 rounded-lg px-3 py-2" placeholder="Masukkan judul laporan...">
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Deskripsi</label>
+                        <textarea id="reportDescription" rows="3" class="w-full border border-gray-300 rounded-lg px-3 py-2" placeholder="Jelaskan detail laporan..."></textarea>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Tingkat Kepentingan</label>
+                        <select id="reportPriority" class="w-full border border-gray-300 rounded-lg px-3 py-2">
+                            <option value="low">🟢 Rendah</option>
+                            <option value="medium">🟡 Sedang</option>
+                            <option value="high">🔴 Tinggi</option>
+                            <option value="urgent">🚨 Darurat</option>
+                        </select>
+                    </div>
+                    
+                    <div class="flex space-x-3 pt-4">
+                        <button type="submit" class="flex-1 bg-blue-600 text-white py-2 px-4 rounded-lg font-medium hover:bg-blue-700 transition-colors">
+                            Kirim Laporan
+                        </button>
+                        <button type="button" id="cancelReport" class="flex-1 bg-gray-300 text-gray-700 py-2 px-4 rounded-lg font-medium hover:bg-gray-400 transition-colors">
+                            Batal
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Achievement Notification -->
+    <div id="achievementNotification" class="fixed top-20 right-4 bg-gradient-to-r from-yellow-400 to-orange-500 text-white p-4 rounded-2xl shadow-xl z-50 transform translate-x-full transition-transform duration-300">
+        <div class="flex items-center space-x-3">
+            <span class="text-2xl">🏆</span>
+            <div>
+                <p class="font-bold">Prestasi Terbuka!</p>
+                <p id="achievementText" class="text-sm">Anda mendapatkan poin komunitas!</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-white/50 backdrop-blur-sm border-t border-gray-200/50 mt-16">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <div class="text-center">
+                <div class="flex items-center justify-center space-x-3 mb-4">
+                    <div class="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
+                        <span class="text-white font-bold text-sm">📍</span>
+                    </div>
+                    <span class="text-lg font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">PinPulse</span>
+                </div>
+                <p class="text-gray-600 text-sm">© 2024 PinPulse - Platform Laporan Komunitas Cerdas. Membuat komunitas lebih baik bersama.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Particles Canvas -->
+    <canvas id="particlesCanvas" class="fixed inset-0 pointer-events-none z-0 opacity-30"></canvas>
+
+    <script src="script.js"></script>
+</body>
+</html>
